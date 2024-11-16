@@ -1,1 +1,0 @@
-#include "Windows/EntryPoint.h"

@@ -17,8 +17,24 @@
 *	You should have received a copy of the GNU General Public License					  *
 *	along with The CronoGames Game Engine.  If not, see <http://www.gnu.org/licenses/>.   *
 ******************************************************************************************/
+#pragma once
+#include <string>
+#include "../Windows/Window.h"
 
-int main()
+namespace CronoEngine
 {
-	return 0;
+	class Application
+	{
+	public:
+		Application( int width, int height, std::string title );
+		~Application();
+		int Run();
+	protected:
+		virtual void Update( float deltaTime ) = 0;
+		virtual void ShutDown() = 0;
+	private:
+		Window wnd;
+	};
 }
+// To be defined in CLIENT
+CronoEngine::Application* CreateEngineApp();

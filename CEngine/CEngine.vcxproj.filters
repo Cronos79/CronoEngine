@@ -2,9 +2,19 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClInclude Include="Windows\WinInclude.h" />
-    <ClInclude Include="Windows\EntryPoint.h" />
+    <ClInclude Include="Windows\EntryPoint.cpp" />
+    <ClInclude Include="Application\Application.h" />
+    <ClInclude Include="Windows\Window.h" />
+    <ClInclude Include="Common\CommonHeaders.h" />
+    <ClInclude Include="Common\CronoException.h" />
+    <ClInclude Include="Windows\Keyboard.h" />
+    <ClInclude Include="Windows\Mouse.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Windows\Source.cpp" />
+    <ClCompile Include="Application\Application.cpp" />
+    <ClCompile Include="Windows\Window.cpp" />
+    <ClCompile Include="Common\CronoException.cpp" />
+    <ClCompile Include="Windows\Keyboard.cpp" />
+    <ClCompile Include="Windows\Mouse.cpp" />
   </ItemGroup>
 </Project>

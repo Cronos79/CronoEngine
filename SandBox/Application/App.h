@@ -18,9 +18,16 @@
 *	along with The CronoGames Game Engine.  If not, see <http://www.gnu.org/licenses/>.   *
 ******************************************************************************************/
 #pragma once
-#include "WinInclude.h"
+#include "Windows/EntryPoint.cpp"
+//#include "../CEditor/Application/App.h"
 
-int CALLBACK WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,int nShowCmd )
+namespace Game
 {
-	return 0;
+	class App : public CronoEngine::Application
+	{
+	public:
+		App( int width, int height, std::string title );
+		void Update( float deltaTime ) override;
+		void ShutDown() override;
+	};
 }
