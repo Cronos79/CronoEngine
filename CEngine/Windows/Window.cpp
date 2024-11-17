@@ -23,6 +23,12 @@
 
 namespace CronoEngine
 {
+	Window* CreateCWindow( int width, int height, const char* name, bool useAsSurface /*= false */ )
+	{
+		Window* wnd = new Window( width, height, name, useAsSurface );
+		return wnd;
+	}
+
 	// Window Class Stuff
 	Window::WindowClass Window::WindowClass::wndClass;
 
@@ -62,7 +68,7 @@ namespace CronoEngine
 	}
 
 	// Window Stuff
-	Window::Window( int width, int height, const char* name )
+	Window::Window( int width, int height, const char* name, bool useAsSurface /*= false */ )
 		:
 		_width( width ),
 		_height( height )
@@ -73,14 +79,15 @@ namespace CronoEngine
 		wr.right = width + wr.left;
 		wr.top = 100;
 		wr.bottom = height + wr.top;
-		if (AdjustWindowRect( &wr, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, FALSE ) == 0)
+		DWORD style = useAsSurface ? WS_CHILD : WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU;
+		if (AdjustWindowRect( &wr, style, FALSE ) == 0)
 		{
 			throw CHWND_LAST_EXCEPT();
 		}
 		// create window & get hWnd
 		_hWnd = CreateWindow(
 			WindowClass::GetName(), name,
-			WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
+			style,
 			CW_USEDEFAULT, CW_USEDEFAULT, wr.right - wr.left, wr.bottom - wr.top,
 			nullptr, nullptr, WindowClass::GetInstance(), this
 		);

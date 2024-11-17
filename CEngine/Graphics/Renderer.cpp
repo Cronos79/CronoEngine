@@ -17,23 +17,45 @@
 *	You should have received a copy of the GNU General Public License					  *
 *	along with The CronoGames Game Engine.  If not, see <http://www.gnu.org/licenses/>.   *
 ******************************************************************************************/
-#pragma once
-#include <string>
-#include <optional>
-#include <cassert>
+#include "Renderer.h"
+#include "GraphicsPlatformInterface.h"
+#include "Direct3D12/DX12Interface.h"
 
-#ifndef DISABLE_COPY
-#define DISABLE_COPY(T)					\
-		explicit T(const T&) = delete;	\
-		T& operator=(const T&) = delete;
-#endif // !DISABLE_COPY
+namespace CronoEngine::Graphics
+{
+	namespace
+	{
+		PlatformInterface gfx{};
 
-#ifndef DISABLE_MOVE
-#define DISABLE_MOVE(T)					\
-		explicit T(T&&) = delete;		\
-		T& operator=(T&&) = delete;
-#endif // !DISABLE_COPY
+		bool SetPlatformInterface( GraphicsPlatform platform )
+		{
+			switch (platform)
+			{
+			case CronoEngine::Graphics::GraphicsPlatform::Direct3D12:
+				CD3D12::GetPlatformInterface( gfx );
+				break;
+			case CronoEngine::Graphics::GraphicsPlatform::OpenGL:
+				break;
+			default:
+				break;
+			}
+			return true;
+		}
+	}
 
-#ifndef DISABLE_COPY_AND_MOVE
-#define DISABLE_COPY_AND_MOVE(T) DISABLE_COPY(T) DISABLE_MOVE(T)
-#endif // !DISABLE_COPY
+	bool Initialize( GraphicsPlatform platform )
+	{
+		return SetPlatformInterface( platform ) && gfx.Initialize();
+	}
+
+	void Shutdown()
+	{
+		gfx.Shutdown();
+	}
+
+	void Render()
+	{
+		gfx.Render();
+	}
+
+}

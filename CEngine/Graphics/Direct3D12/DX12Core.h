@@ -18,22 +18,21 @@
 *	along with The CronoGames Game Engine.  If not, see <http://www.gnu.org/licenses/>.   *
 ******************************************************************************************/
 #pragma once
-#include <string>
-#include <optional>
-#include <cassert>
+#include "DX12CommonHeaders.h"
 
-#ifndef DISABLE_COPY
-#define DISABLE_COPY(T)					\
-		explicit T(const T&) = delete;	\
-		T& operator=(const T&) = delete;
-#endif // !DISABLE_COPY
+namespace CronoEngine::Graphics::CD3D12::Core
+{
+	bool Initialize();
+	void Shutdown();
+	void Render();
 
-#ifndef DISABLE_MOVE
-#define DISABLE_MOVE(T)					\
-		explicit T(T&&) = delete;		\
-		T& operator=(T&&) = delete;
-#endif // !DISABLE_COPY
-
-#ifndef DISABLE_COPY_AND_MOVE
-#define DISABLE_COPY_AND_MOVE(T) DISABLE_COPY(T) DISABLE_MOVE(T)
-#endif // !DISABLE_COPY
+	template<typename T>
+	constexpr void Release( T*& resource )
+	{
+		if (resource)
+		{
+			resource->Release();
+			resource = nullptr;
+		}		
+	}
+}

@@ -18,18 +18,20 @@
 *	along with The CronoGames Game Engine.  If not, see <http://www.gnu.org/licenses/>.   *
 ******************************************************************************************/
 #include "App.h"
+#include "Scene/Entity/Component/TransformComponent.h"
+#include "../CEngine/Scene/Scene.h"
 
 namespace CronoEngine
 {
 
-	App::App( int width, int height, std::string title )
-		:Application(width, height, title)
+	App::App( int width, int height, std::string title, bool useAsSurface /*= false*/ )
+		:Application(width, height, title, useAsSurface)
 	{
-
+		
 	}
 
 	void App::Update( float deltaTime )
-	{
+	{	
 		//OutputDebugString( "OnUpdate\n" );
 	}
 
@@ -40,5 +42,5 @@ namespace CronoEngine
 }
 CronoEngine::Application* CreateEngineApp()
 {	
-	return new CronoEngine::App(1920,1080, "CronoEditor");
+	return new CronoEngine::App(1920,1080, "CronoEditor", false);
 }

@@ -18,14 +18,18 @@
 *	along with The CronoGames Game Engine.  If not, see <http://www.gnu.org/licenses/>.   *
 ******************************************************************************************/
 #include "Application.h"
+#include "../Scene/Entity/Component/TransformComponent.h"
+#include "Graphics/Renderer.h"
 
 namespace CronoEngine
 {
 
-	Application::Application(int width, int height, std::string title)
-		: wnd(width, height, title.c_str())
+	Application::Application(int width, int height, std::string title, bool useAsSurface /*= false*/ )
 	{
-
+		m_Project = new Project();
+		m_Surface = new Graphics::RenderSurface();
+		m_Surface->CWindow = CreateCWindow( width, height, title.c_str(), useAsSurface );
+		CronoEngine::Graphics::Initialize( CronoEngine::Graphics::GraphicsPlatform::Direct3D12 );
 	}
 
 	Application::~Application()

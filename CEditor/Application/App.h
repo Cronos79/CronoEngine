@@ -26,7 +26,7 @@ namespace CronoEngine
 	class App : public Application
 	{
 	public:
-		App( int width, int height, std::string title );
+		App( int width, int height, std::string title, bool useAsSurface = false );
 		void Update( float deltaTime ) override;
 		void ShutDown() override;
 	};

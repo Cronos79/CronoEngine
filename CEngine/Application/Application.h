@@ -20,20 +20,23 @@
 #pragma once
 #include <string>
 #include "../Windows/Window.h"
+#include "../Project/Project.h"
+#include "../Graphics/Renderer.h"
 
 namespace CronoEngine
 {
 	class Application
 	{
 	public:
-		Application( int width, int height, std::string title );
+		Application( int width, int height, std::string title, bool useAsSurface = false );
 		~Application();
 		int Run();
 	protected:
 		virtual void Update( float deltaTime ) = 0;
 		virtual void ShutDown() = 0;
-	private:
-		Window wnd;
+	protected:
+		Graphics::RenderSurface* m_Surface;
+		Project* m_Project;
 	};
 }
 // To be defined in CLIENT

@@ -44,7 +44,7 @@ namespace CronoEngine
 			HINSTANCE hInst;
 		};
 	public:
-		Window( int width, int height, const char* name );
+		Window( int width, int height, const char* name, bool useAsSurface = false );
 		~Window();
 		Window( const Window& ) = delete;
 		Window& operator=( const Window& ) = delete;
@@ -64,5 +64,7 @@ namespace CronoEngine
 		HWND _hWnd;
 		std::vector<BYTE> rawBuffer;
 	};
+
+	Window* CreateCWindow( int width, int height, const char* name, bool useAsSurface = false );
 }
 

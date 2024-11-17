@@ -17,23 +17,14 @@
 *	You should have received a copy of the GNU General Public License					  *
 *	along with The CronoGames Game Engine.  If not, see <http://www.gnu.org/licenses/>.   *
 ******************************************************************************************/
-#pragma once
-#include <string>
-#include <optional>
-#include <cassert>
+#include "Project.h"
 
-#ifndef DISABLE_COPY
-#define DISABLE_COPY(T)					\
-		explicit T(const T&) = delete;	\
-		T& operator=(const T&) = delete;
-#endif // !DISABLE_COPY
+CronoEngine::Project::Project()
+{
+	ActiveScene = new Scene();
+}
 
-#ifndef DISABLE_MOVE
-#define DISABLE_MOVE(T)					\
-		explicit T(T&&) = delete;		\
-		T& operator=(T&&) = delete;
-#endif // !DISABLE_COPY
+CronoEngine::Project::~Project()
+{
 
-#ifndef DISABLE_COPY_AND_MOVE
-#define DISABLE_COPY_AND_MOVE(T) DISABLE_COPY(T) DISABLE_MOVE(T)
-#endif // !DISABLE_COPY
+}

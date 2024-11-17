@@ -9,6 +9,14 @@
     <ClInclude Include="Common\CronoException.h" />
     <ClInclude Include="Windows\Keyboard.h" />
     <ClInclude Include="Windows\Mouse.h" />
+    <ClInclude Include="Scene\Scene.h" />
+    <ClInclude Include="Scene\Entity\Component\TransformComponent.h" />
+    <ClInclude Include="Project\Project.h" />
+    <ClInclude Include="Graphics\Renderer.h" />
+    <ClInclude Include="Graphics\GraphicsPlatformInterface.h" />
+    <ClInclude Include="Graphics\Direct3D12\DX12Interface.h" />
+    <ClInclude Include="Graphics\Direct3D12\DX12Core.h" />
+    <ClInclude Include="Graphics\Direct3D12\DX12CommonHeaders.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application\Application.cpp" />
@@ -16,5 +24,10 @@
     <ClCompile Include="Common\CronoException.cpp" />
     <ClCompile Include="Windows\Keyboard.cpp" />
     <ClCompile Include="Windows\Mouse.cpp" />
+    <ClCompile Include="Scene\Scene.cpp" />
+    <ClCompile Include="Project\Project.cpp" />
+    <ClCompile Include="Graphics\Renderer.cpp" />
+    <ClCompile Include="Graphics\Direct3D12\DX12Interface.cpp" />
+    <ClCompile Include="Graphics\Direct3D12\DX12Core.cpp" />
   </ItemGroup>
 </Project>
