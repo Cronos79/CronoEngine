@@ -17,6 +17,7 @@
     <ClInclude Include="Graphics\Direct3D12\DX12Interface.h" />
     <ClInclude Include="Graphics\Direct3D12\DX12Core.h" />
     <ClInclude Include="Graphics\Direct3D12\DX12CommonHeaders.h" />
+    <ClInclude Include="Graphics\Direct3D12\D3D12Resources.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application\Application.cpp" />
@@ -29,5 +30,6 @@
     <ClCompile Include="Graphics\Renderer.cpp" />
     <ClCompile Include="Graphics\Direct3D12\DX12Interface.cpp" />
     <ClCompile Include="Graphics\Direct3D12\DX12Core.cpp" />
+    <ClCompile Include="Graphics\Direct3D12\D3D12Resources.cpp" />
   </ItemGroup>
 </Project>

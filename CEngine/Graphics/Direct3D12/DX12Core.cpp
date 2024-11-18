@@ -18,17 +18,26 @@
 *	along with The CronoGames Game Engine.  If not, see <http://www.gnu.org/licenses/>.   *
 ******************************************************************************************/
 #include "DX12Core.h"
-
+#include "D3D12Resources.h"
+#include <unknwn.h>
 
 using namespace Microsoft::WRL;
 
 namespace CronoEngine::Graphics::CD3D12::Core
 {
+#pragma region AnonymouseRegion
 	namespace
 	{
 		void FailedInit( HRESULT hr )
 		{
-			Shutdown();
+			try
+			{
+				Shutdown();
+			}
+			catch (std::exception* e)
+			{
+				// #TODO: Log me
+			}			
 			throw CHWND_EXCEPT( hr );
 		}
 
@@ -118,17 +127,24 @@ namespace CronoEngine::Graphics::CD3D12::Core
 
 			void Release()
 			{
-				Flush();
-				Core::Release( _fence );
-				_fenceValue = 0;
-				CloseHandle( _fenceEvent );
-				_fenceEvent = nullptr;
-				Core::Release( _cmdQueue );
-				Core::Release( _cmdList );
-				for (int32_t i{ 0 }; i < FrameBufferCount; ++i)
+				try
 				{
-					_cmdFrames[i].Release();
+					Flush();
+					Core::Release( _fence );
+					_fenceValue = 0;
+					CloseHandle( _fenceEvent );
+					_fenceEvent = nullptr;
+					Core::Release( _cmdQueue );
+					Core::Release( _cmdList );
+					for (int32_t i{ 0 }; i < FrameBufferCount; ++i)
+					{
+						_cmdFrames[i].Release();
+					}
 				}
+				catch (std::exception* e)
+				{
+					// #TODO: Log me
+				}				
 			}
 
 			constexpr ID3D12CommandQueue* const CommandQueue() const
@@ -167,6 +183,7 @@ namespace CronoEngine::Graphics::CD3D12::Core
 				void Release()
 				{
 					Core::Release( cmdAllocator );
+					fenceValue = 0;
 				}
 			};
 			ID3D12CommandQueue* _cmdQueue{ nullptr };
@@ -182,6 +199,13 @@ namespace CronoEngine::Graphics::CD3D12::Core
 		ID3D12Device14* MainDevice{ nullptr };
 		IDXGIFactory7* DxgiFactory{ nullptr };
 		D3D12_Command* gfxCommand;
+		DescriptorHeap rtvDescHeap{ D3D12_DESCRIPTOR_HEAP_TYPE_RTV };
+		DescriptorHeap dsvDescHeap{ D3D12_DESCRIPTOR_HEAP_TYPE_DSV };
+		DescriptorHeap srvDescHeap{ D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV };
+		DescriptorHeap uavDescHeap{ D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV };
+		std::vector<IUnknown*> DeferredReleases[FrameBufferCount]{};
+		int32_t deferredReleasesFlag[FrameBufferCount]{ 0 };
+		std::mutex deferredReleasesMutex{};
 
 		constexpr D3D_FEATURE_LEVEL MinimumFeatureLevel{ D3D_FEATURE_LEVEL_11_0 };	
 
@@ -221,8 +245,40 @@ namespace CronoEngine::Graphics::CD3D12::Core
 			if (FAILED( hr )) FailedInit( hr );
 			return featureLevelInfo.MaxSupportedFeatureLevel;
 		}
-	}
 
+		void __declspec(noinline) ProcessDeferredReleases( int32_t frameIdx )
+		{
+			std::lock_guard lock{ deferredReleasesMutex };
+
+			deferredReleasesFlag[frameIdx] = 0;
+
+			rtvDescHeap.ProcessDeferredFree( frameIdx );
+			dsvDescHeap.ProcessDeferredFree( frameIdx );
+			srvDescHeap.ProcessDeferredFree( frameIdx );
+			uavDescHeap.ProcessDeferredFree( frameIdx );
+			
+			std::vector<IUnknown*>& resources{ DeferredReleases[frameIdx] };
+			if (!resources.empty())
+			{
+				for (auto& resource : resources) Release( resource );
+				resources.clear();
+			}
+		}
+	}
+	/********************************************* End Anonymous Namespace *********************************************/
+
+	namespace detail
+	{
+		void DeferredRelease( IUnknown* resource )
+		{
+			const int32_t frameIdx{ CurrentFrameIndex() };
+			std::lock_guard lock{ deferredReleasesMutex };
+			DeferredReleases[frameIdx].push_back( resource );
+			SetDeferredReleasesFlag();
+		}
+	} // detail namespace
+#pragma endregion AnonymouseRegion
+#pragma region CD3D12Region
 	bool Initialize()
 	{
 		if (MainDevice) Shutdown();
@@ -234,10 +290,12 @@ namespace CronoEngine::Graphics::CD3D12::Core
 		{
 			ComPtr<ID3D12Debug6> debugInterface;
 			hr = D3D12GetDebugInterface( IID_PPV_ARGS( &debugInterface ) );
-			if (FAILED( hr )) FailedInit( hr );
-			debugInterface->EnableDebugLayer();			
-		}
-		dxgiFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG;
+			if (SUCCEEDED( hr ))
+			{
+				debugInterface->EnableDebugLayer();
+			}	
+			dxgiFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG;
+		}		
 #endif // _DEBUG
 
 		
@@ -255,11 +313,6 @@ namespace CronoEngine::Graphics::CD3D12::Core
 		hr = D3D12CreateDevice( mainAdapter.Get(), maxFeatureLevel, IID_PPV_ARGS( &MainDevice ) );
 		if (FAILED( hr )) FailedInit( hr );
 
-		new(&gfxCommand) D3D12_Command( MainDevice, D3D12_COMMAND_LIST_TYPE_DIRECT );
-		if(!gfxCommand->CommandQueue()) FailedInit( -1 );
-
-		NAME_D3D12_OBJECT( MainDevice, L"MAIN D3D12 DEVICE" );
-
 #ifdef _DEBUG
 		{
 			ComPtr<ID3D12InfoQueue1> infoQueue;
@@ -272,13 +325,43 @@ namespace CronoEngine::Graphics::CD3D12::Core
 		}
 #endif // _DEBUG
 
+		bool result{ true };
+		result &= rtvDescHeap.Initialize( 512, false );
+		result &= dsvDescHeap.Initialize( 512, false );
+		result &= srvDescHeap.Initialize( 4096, false );
+		result &= uavDescHeap.Initialize( 512, false );
+		if (!result) FailedInit(-1);
+
+		new(&gfxCommand) D3D12_Command( MainDevice, D3D12_COMMAND_LIST_TYPE_DIRECT );
+		if(!gfxCommand->CommandQueue()) FailedInit( -1 );
+
+		NAME_D3D12_OBJECT( MainDevice, L"MAIN D3D12 DEVICE" );
+		NAME_D3D12_OBJECT( rtvDescHeap.heap(), L"RTV DESCRIPTOR HEAP" );
+		NAME_D3D12_OBJECT( dsvDescHeap.heap(), L"DSV DESCRIPTOR HEAP" );
+		NAME_D3D12_OBJECT( srvDescHeap.heap(), L"SRV DESCRIPTOR HEAP" );
+		NAME_D3D12_OBJECT( uavDescHeap.heap(), L"UAV DESCRIPTOR HEAP" );
+
 		return true;
 	}
 
 	void Shutdown()
 	{
 		gfxCommand->Release();
+
+		// #NOTE: Don't call ProcessDeferredReleases at the end. Some resources can't be released before there dependents
+		for (int32_t i{ 0 }; i < FrameBufferCount; ++i)
+		{
+			ProcessDeferredReleases( i );
+		}
+
 		Release( DxgiFactory );
+		rtvDescHeap.Release();
+		dsvDescHeap.Release();
+		srvDescHeap.Release();
+		uavDescHeap.Release();
+
+		// #NOTE: Some resources use deferred release so call it again to release them once more.
+		ProcessDeferredReleases( 0 );
 #ifdef _DEBUG
 		{
 			HRESULT hr{ S_OK };
@@ -307,6 +390,11 @@ namespace CronoEngine::Graphics::CD3D12::Core
 	{
 		gfxCommand->BeginFrame();
 		ID3D12GraphicsCommandList10* cmdList{ gfxCommand->CommandList() };
+		const int32_t frameIdx{ CurrentFrameIndex() };
+		if (deferredReleasesFlag[frameIdx])
+		{
+			ProcessDeferredReleases( frameIdx );
+		}
 		// Record commands
 		// ...
 		// Done recording commands
@@ -314,7 +402,19 @@ namespace CronoEngine::Graphics::CD3D12::Core
 		gfxCommand->EndFrame();
 	}
 
+	ID3D12Device14* const Device()
+	{
+		return MainDevice;
+	}
 
+	int32_t CurrentFrameIndex()
+	{
+		return gfxCommand->FrameIndex();
+	}
 
-
+	void SetDeferredReleasesFlag()
+	{
+		deferredReleasesFlag[CurrentFrameIndex()] = 1;
+	}
+#pragma endregion CD3D12Region
 }

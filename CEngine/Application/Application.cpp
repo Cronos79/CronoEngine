@@ -34,7 +34,7 @@ namespace CronoEngine
 
 	Application::~Application()
 	{
-
+		//CronoEngine::Graphics::Shutdown();
 	}
 
 	int Application::Run()

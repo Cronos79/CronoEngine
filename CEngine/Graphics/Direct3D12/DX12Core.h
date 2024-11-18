@@ -35,4 +35,24 @@ namespace CronoEngine::Graphics::CD3D12::Core
 			resource = nullptr;
 		}		
 	}
+
+	namespace detail
+	{
+		void DeferredRelease( IUnknown* resource );
+	}
+
+	template<typename T>
+	constexpr void DeferredRelease( T*& resource )
+	{
+		if (resource)
+		{
+			detail::DeferredRelease( resource );
+			resource->Release();
+			resource = nullptr;
+		}
+	}
+
+	ID3D12Device14* const Device();
+	int32_t CurrentFrameIndex();
+	void SetDeferredReleasesFlag();
 }

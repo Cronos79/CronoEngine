@@ -21,6 +21,9 @@
 #include <string>
 #include <optional>
 #include <cassert>
+#include <memory>
+#include <mutex>
+#include <vector>
 
 #ifndef DISABLE_COPY
 #define DISABLE_COPY(T)					\

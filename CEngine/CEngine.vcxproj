@@ -99,6 +99,7 @@
     <ClInclude Include="Application\Application.h" />
     <ClInclude Include="Common\CommonHeaders.h" />
     <ClInclude Include="Common\CronoException.h" />
+    <ClInclude Include="Graphics\Direct3D12\D3D12Resources.h" />
     <ClInclude Include="Graphics\Direct3D12\DX12CommonHeaders.h" />
     <ClInclude Include="Graphics\Direct3D12\DX12Core.h" />
     <ClInclude Include="Graphics\Direct3D12\DX12Interface.h" />
@@ -116,6 +117,7 @@
   <ItemGroup>
     <ClCompile Include="Application\Application.cpp" />
     <ClCompile Include="Common\CronoException.cpp" />
+    <ClCompile Include="Graphics\Direct3D12\D3D12Resources.cpp" />
     <ClCompile Include="Graphics\Direct3D12\DX12Core.cpp" />
     <ClCompile Include="Graphics\Direct3D12\DX12Interface.cpp" />
     <ClCompile Include="Graphics\Renderer.cpp" />
