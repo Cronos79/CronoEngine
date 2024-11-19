@@ -18,44 +18,41 @@
 *	along with The CronoGames Game Engine.  If not, see <http://www.gnu.org/licenses/>.   *
 ******************************************************************************************/
 #include "Renderer.h"
-#include "GraphicsPlatformInterface.h"
-#include "Direct3D12/DX12Interface.h"
+#include "Common/CronoException.h"
 
 namespace CronoEngine::Graphics
 {
-	namespace
-	{
-		PlatformInterface gfx{};
+	
+	Renderer::Renderer( int32_t width, int32_t height, std::string title, bool hasBorder )
+		: _Width(width), _Height(height)
+	{		
+		CWindow = CreateCWindow( width, height, title.c_str(), hasBorder );	
+		CWindow->Gfx().Init();
+	}
 
-		bool SetPlatformInterface( GraphicsPlatform platform )
+	Renderer::~Renderer()
+	{
+
+	}
+
+	CronoEngine::Graphics::DX12Core& Renderer::Gfx()
+	{
+		if (&CWindow->Gfx() == nullptr)
 		{
-			switch (platform)
-			{
-			case CronoEngine::Graphics::GraphicsPlatform::Direct3D12:
-				CD3D12::GetPlatformInterface( gfx );
-				break;
-			case CronoEngine::Graphics::GraphicsPlatform::OpenGL:
-				break;
-			default:
-				break;
-			}
-			return true;
+			throw CHWND_NOGFX_EXCEPT();
 		}
+		return CWindow->Gfx();
 	}
 
-	bool Initialize( GraphicsPlatform platform )
+	CronoEngine::Window* Renderer::GetWindow()
 	{
-		return SetPlatformInterface( platform ) && gfx.Initialize();
+		return CWindow;
 	}
 
-	void Shutdown()
+	void Renderer::Resize( int32_t width, int32_t height )
 	{
-		gfx.Shutdown();
-	}
-
-	void Render()
-	{
-		gfx.Render();
+		CWindow->Resize( width, height );
+		CWindow->Gfx().Resize( width, height );
 	}
 
 }

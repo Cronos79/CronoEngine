@@ -28,6 +28,8 @@ int CALLBACK WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine
 {
 	try
 	{
+		SetThreadDpiAwarenessContext( DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 );
+
 		CronoEngine::Application* app = CreateEngineApp();
 		return app->Run();
 	}

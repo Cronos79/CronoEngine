@@ -21,6 +21,7 @@
 #include "Scene/Entity/Component/TransformComponent.h"
 #include "../CEngine/Scene/Scene.h"
 
+
 namespace CronoEngine
 {
 
@@ -30,9 +31,31 @@ namespace CronoEngine
 		
 	}
 
-	void App::Update( float deltaTime )
+	void App::HandleInput( float deltaTime )
+	{
+		if (CRenderer->GetWindow()->kbd.KeyIsPressed( VK_ESCAPE ))
+		{
+			PostQuitMessage( 0 );
+		}
+		if (CRenderer->GetWindow()->kbd.KeyIsPressed( 'V' ))
+		{
+			CRenderer->Gfx().ToggleVSync();
+		}
+		if (CRenderer->GetWindow()->kbd.KeyIsPressed( VK_F11 ))
+		{
+			CRenderer->GetWindow()->SetFullscreen();
+		}
+	}
+
+	void App::Update( float deltaTimeF )
 	{	
-		//OutputDebugString( "OnUpdate\n" );
+		ImGuiIO& io = ImGui::GetIO(); (void)io;
+		ImGui::Begin( "FPS" );
+		ImGui::Text( "Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate );
+		ImGui::End();
+		ImGui::Begin( "FPS1" );
+		ImGui::Text( "Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate );
+		ImGui::End();
 	}
 
 	void App::ShutDown()

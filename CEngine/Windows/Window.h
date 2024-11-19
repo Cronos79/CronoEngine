@@ -22,6 +22,8 @@
 #include "../Common/CommonHeaders.h"
 #include "Keyboard.h"
 #include "Mouse.h"
+#include "Graphics/DX12/DX12Core.h"
+
 
 namespace CronoEngine
 {
@@ -50,6 +52,13 @@ namespace CronoEngine
 		Window& operator=( const Window& ) = delete;
 		void SetTitle( const std::string& title );
 		static std::optional<int> ProcessMessages() noexcept;
+
+		inline HWND GetHWND() { return _hWnd; }
+		Graphics::DX12Core& Gfx();
+
+		void SetFullscreen( );
+		void SetFullscreen( bool fullScreen );
+		void Resize( int32_t width, int32_t height );
 	private:
 		static LRESULT CALLBACK HandleMsgSetup( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam ) noexcept;
 		static LRESULT CALLBACK HandleMsgThunk( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam ) noexcept;
@@ -61,8 +70,14 @@ namespace CronoEngine
 	private:
 		int _width;
 		int _height;
+		// Window rectangle (used to toggle fullscreen state).
+		RECT _WindowRect;
+		// By default, use windowed mode.
+		// Can be toggled with the Alt+Enter or F11
+		bool _Fullscreen = false;
 		HWND _hWnd;
 		std::vector<BYTE> rawBuffer;
+		std::unique_ptr<Graphics::DX12Core> pGfx;
 	};
 
 	Window* CreateCWindow( int width, int height, const char* name, bool useAsSurface = false );

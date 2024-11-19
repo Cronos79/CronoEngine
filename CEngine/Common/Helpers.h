@@ -17,18 +17,16 @@
 *	You should have received a copy of the GNU General Public License					  *
 *	along with The CronoGames Game Engine.  If not, see <http://www.gnu.org/licenses/>.   *
 ******************************************************************************************/
-#include "DX12Interface.h"
-#include "Graphics/GraphicsPlatformInterface.h"
-#include "DX12Core.h"
+#pragma once
+#include "Windows/WinInclude.h"
+#include "CronoException.h"
 
-namespace CronoEngine::Graphics::CD3D12
+// From DXSampleHelper.h 
+// Source: https://github.com/Microsoft/DirectX-Graphics-Samples
+inline void ThrowIfFailed( HRESULT hr )
 {
-
-	void GetPlatformInterface( PlatformInterface& pi )
+	if (FAILED( hr ))
 	{
-		pi.Initialize = Core::Initialize;
-		pi.Shutdown = Core::Shutdown;
-		pi.Render = Core::Render;
+		throw CHWND_EXCEPT( hr );
 	}
-
 }

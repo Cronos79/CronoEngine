@@ -18,28 +18,24 @@
 *	along with The CronoGames Game Engine.  If not, see <http://www.gnu.org/licenses/>.   *
 ******************************************************************************************/
 #pragma once
-#include "../Windows/Window.h"
+#include "Windows/Window.h"
+#include "Common/CommonHeaders.h"
+#include "DX12/DX12Core.h"
 
 namespace CronoEngine::Graphics
 {
-	class Surface
+	class Renderer
 	{
+	public:
+		Renderer(int32_t width, int32_t height, std::string title, bool hasBorder);
+		~Renderer();
+
+		DX12Core& Gfx();
+		Window* GetWindow();
+		void Resize( int32_t width, int32_t height );
+	private:
+		Window* CWindow;		
+		int32_t _Width;
+		int32_t _Height;
 	};
-
-	struct RenderSurface
-	{
-		Window* CWindow{};
-		Surface* CSurface{};
-	};
-
-	enum class GraphicsPlatform : int32_t
-	{
-		Direct3D12 = 0,
-		OpenGL = 1,
-	};
-
-	bool Initialize( GraphicsPlatform platform);
-	void Shutdown();
-
-	void Render();
 }

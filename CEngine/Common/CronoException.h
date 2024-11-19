@@ -18,7 +18,7 @@
 *	along with The CronoGames Game Engine.  If not, see <http://www.gnu.org/licenses/>.   *
 ******************************************************************************************/
 #pragma once
-#include "../Windows/WinInclude.h"
+#include "Windows/WinInclude.h"
 #include <exception>
 #include <string>
 
@@ -51,7 +51,14 @@ namespace CronoEngine
 	private:
 		HRESULT hr;
 	};
+	class NoGfxException : public CronoException
+	{
+	public:
+		using CronoException::CronoException;
+		const char* GetType() const noexcept override;
+	};
 }
 
 #define CHWND_EXCEPT( hr ) CronoEngine::HrException( __LINE__,__FILE__,(hr) )
 #define CHWND_LAST_EXCEPT() CronoEngine::HrException( __LINE__,__FILE__,GetLastError() )
+#define CHWND_NOGFX_EXCEPT() CronoEngine::NoGfxException( __LINE__,__FILE__ )

@@ -116,4 +116,10 @@ namespace CronoEngine
 		LocalFree( pMsgBuf );
 		return errorString;
 	}
+
+	const char* NoGfxException::GetType() const noexcept
+	{
+		return "No Graphics Exception";
+	}
+
 }

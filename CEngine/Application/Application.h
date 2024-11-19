@@ -18,25 +18,45 @@
 *	along with The CronoGames Game Engine.  If not, see <http://www.gnu.org/licenses/>.   *
 ******************************************************************************************/
 #pragma once
-#include <string>
-#include "../Windows/Window.h"
-#include "../Project/Project.h"
-#include "../Graphics/Renderer.h"
+#include "Common/CommonHeaders.h"
+#include "Windows/Window.h"
+#include "Project/Project.h"
 
 namespace CronoEngine
 {
 	class Application
 	{
 	public:
-		Application( int width, int height, std::string title, bool useAsSurface = false );
+		Application( int width, int height, std::string title, bool hasBorder = false );
 		~Application();
 		int Run();
+		/**
+		 *  Initialize the DirectX Runtime.
+		*/
+		virtual bool Initialize( int width, int height, std::string title, bool hasBorder = false );
+
+		/**
+		 *  Load content required for the demo.
+		 */
+		virtual bool LoadContent() = 0;
+
+		/**
+		 *  Unload demo specific content that was loaded in LoadContent.
+		 */
+		virtual void UnloadContent() = 0;
+
+		/**
+		 * Destroy any resource that are used by the game.
+		 */
+		virtual void ShutDown();
 	protected:
+		virtual void HandleInput( float deltaTime ) = 0;
 		virtual void Update( float deltaTime ) = 0;
-		virtual void ShutDown() = 0;
+	private:
+		void ParseCommandLineArguments();
 	protected:
-		Graphics::RenderSurface* m_Surface;
 		Project* m_Project;
+		Graphics::Renderer* CRenderer = nullptr;
 	};
 }
 // To be defined in CLIENT

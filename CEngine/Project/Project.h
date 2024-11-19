@@ -18,8 +18,10 @@
 *	along with The CronoGames Game Engine.  If not, see <http://www.gnu.org/licenses/>.   *
 ******************************************************************************************/
 #pragma once
-#include "../Common/CommonHeaders.h"
-#include "../Scene/Scene.h"
+#include "Common/CommonHeaders.h"
+#include "Scene/Scene.h"
+#include "Windows/Window.h"
+#include "Graphics/Renderer.h"
 
 namespace CronoEngine
 {
@@ -29,7 +31,7 @@ namespace CronoEngine
 		Project();
 		~Project();
 	private:
-	public:
+	public:		
 		Scene* ActiveScene;
 	private:
 	};

@@ -63,7 +63,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <DisableSpecificWarnings>4100;4101;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)Vendor\entt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)CEngine\imgui;$(ProjectDir);$(SolutionDir)Vendor\entt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -85,7 +85,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DisableSpecificWarnings>4100;4101;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)Vendor\entt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)CEngine\imgui;$(ProjectDir);$(SolutionDir)Vendor\entt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -99,12 +99,31 @@
     <ClInclude Include="Application\Application.h" />
     <ClInclude Include="Common\CommonHeaders.h" />
     <ClInclude Include="Common\CronoException.h" />
-    <ClInclude Include="Graphics\Direct3D12\D3D12Resources.h" />
-    <ClInclude Include="Graphics\Direct3D12\DX12CommonHeaders.h" />
-    <ClInclude Include="Graphics\Direct3D12\DX12Core.h" />
-    <ClInclude Include="Graphics\Direct3D12\DX12Interface.h" />
-    <ClInclude Include="Graphics\GraphicsPlatformInterface.h" />
+    <ClInclude Include="Common\Helpers.h" />
+    <ClInclude Include="Graphics\DX12\CommandQueue.h" />
+    <ClInclude Include="Graphics\DX12\d3dx12.h" />
+    <ClInclude Include="Graphics\DX12\d3dx12_barriers.h" />
+    <ClInclude Include="Graphics\DX12\d3dx12_check_feature_support.h" />
+    <ClInclude Include="Graphics\DX12\d3dx12_core.h" />
+    <ClInclude Include="Graphics\DX12\d3dx12_default.h" />
+    <ClInclude Include="Graphics\DX12\d3dx12_pipeline_state_stream.h" />
+    <ClInclude Include="Graphics\DX12\d3dx12_property_format_table.h" />
+    <ClInclude Include="Graphics\DX12\d3dx12_render_pass.h" />
+    <ClInclude Include="Graphics\DX12\d3dx12_resource_helpers.h" />
+    <ClInclude Include="Graphics\DX12\d3dx12_root_signature.h" />
+    <ClInclude Include="Graphics\DX12\d3dx12_state_object.h" />
+    <ClInclude Include="Graphics\DX12\DX12Utility.h" />
+    <ClInclude Include="Graphics\DX12\DX12CommonIncludes.h" />
+    <ClInclude Include="Graphics\DX12\DX12Core.h" />
     <ClInclude Include="Graphics\Renderer.h" />
+    <ClInclude Include="imgui\imconfig.h" />
+    <ClInclude Include="imgui\imgui.h" />
+    <ClInclude Include="imgui\imgui_impl_dx12.h" />
+    <ClInclude Include="imgui\imgui_impl_win32.h" />
+    <ClInclude Include="imgui\imgui_internal.h" />
+    <ClInclude Include="imgui\imstb_rectpack.h" />
+    <ClInclude Include="imgui\imstb_textedit.h" />
+    <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="Project\Project.h" />
     <ClInclude Include="Scene\Entity\Component\TransformComponent.h" />
     <ClInclude Include="Scene\Scene.h" />
@@ -117,15 +136,30 @@
   <ItemGroup>
     <ClCompile Include="Application\Application.cpp" />
     <ClCompile Include="Common\CronoException.cpp" />
-    <ClCompile Include="Graphics\Direct3D12\D3D12Resources.cpp" />
-    <ClCompile Include="Graphics\Direct3D12\DX12Core.cpp" />
-    <ClCompile Include="Graphics\Direct3D12\DX12Interface.cpp" />
+    <ClCompile Include="Graphics\DX12\CommandQueue.cpp" />
+    <ClCompile Include="Graphics\DX12\DX12Utility.cpp" />
+    <ClCompile Include="Graphics\DX12\DX12Core.cpp" />
     <ClCompile Include="Graphics\Renderer.cpp" />
+    <ClCompile Include="imgui\imgui.cpp" />
+    <ClCompile Include="imgui\imgui_demo.cpp" />
+    <ClCompile Include="imgui\imgui_draw.cpp" />
+    <ClCompile Include="imgui\imgui_impl_dx12.cpp" />
+    <ClCompile Include="imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="imgui\imgui_tables.cpp" />
+    <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="Project\Project.cpp" />
     <ClCompile Include="Scene\Scene.cpp" />
     <ClCompile Include="Windows\Mouse.cpp" />
     <ClCompile Include="Windows\Keyboard.cpp" />
     <ClCompile Include="Windows\Window.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Graphics\Shaders\VertexShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.7</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.7</ShaderModel>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -18,8 +18,8 @@
 *	along with The CronoGames Game Engine.  If not, see <http://www.gnu.org/licenses/>.   *
 ******************************************************************************************/
 #include "Window.h"
-#include "../Common/CronoException.h"
-
+#include "Common/CronoException.h"
+#include "Graphics/DX12/DX12CommonIncludes.h"
 
 namespace CronoEngine
 {
@@ -98,6 +98,7 @@ namespace CronoEngine
 		}
 		// newly created windows start off as hidden
 		ShowWindow( _hWnd, SW_SHOWDEFAULT );
+		pGfx = std::make_unique<Graphics::DX12Core>( _hWnd, width, height );
 		// register mouse raw input device
 		RAWINPUTDEVICE rid;
 		rid.usUsagePage = 0x01; // mouse page
@@ -108,6 +109,32 @@ namespace CronoEngine
 		{
 			throw CHWND_LAST_EXCEPT();
 		}
+
+		// Setup Dear ImGui context
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO(); (void)io;
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
+		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
+		//io.ConfigViewportsNoAutoMerge = true;
+		//io.ConfigViewportsNoTaskBarIcon = true;
+
+		// Setup Dear ImGui style
+		ImGui::StyleColorsDark();
+		//ImGui::StyleColorsLight();
+
+		// When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
+		ImGuiStyle& imstyle = ImGui::GetStyle();
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			imstyle.WindowRounding = 0.0f;
+			imstyle.Colors[ImGuiCol_WindowBg].w = 1.0f;
+		}
+
+		// Setup Platform/Renderer backends
+		ImGui_ImplWin32_Init( _hWnd );
 	}
 
 	Window::~Window()
@@ -145,6 +172,72 @@ namespace CronoEngine
 		return {};
 	}
 
+	CronoEngine::Graphics::DX12Core& Window::Gfx()
+	{
+		return *pGfx;
+	}
+
+	void Window::SetFullscreen( bool fullscreen )
+	{
+		if (_Fullscreen != fullscreen)
+		{
+			_Fullscreen = fullscreen;
+
+			if (_Fullscreen) // Switching to fullscreen.
+			{
+				// Store the current window dimensions so they can be restored 
+				// when switching out of fullscreen state.
+				::GetWindowRect( _hWnd, &_WindowRect );
+				// Set the window style to a borderless window so the client area fills
+				// the entire screen.
+				UINT windowStyle = 0 & ~(WS_OVERLAPPEDWINDOW | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX);
+
+				::SetWindowLongW( _hWnd, GWL_STYLE, windowStyle );
+				// Query the name of the nearest display device for the window.
+				// This is required to set the fullscreen dimensions of the window
+				// when using a multi-monitor setup.
+				HMONITOR hMonitor = ::MonitorFromWindow( _hWnd, MONITOR_DEFAULTTONEAREST );
+				MONITORINFOEX monitorInfo = {};
+				monitorInfo.cbSize = sizeof( MONITORINFOEX );
+				::GetMonitorInfo( hMonitor, &monitorInfo );
+				::SetWindowPos( _hWnd, HWND_TOP,
+					monitorInfo.rcMonitor.left,
+					monitorInfo.rcMonitor.top,
+					monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left,
+					monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top,
+					SWP_FRAMECHANGED | SWP_NOACTIVATE );
+
+				::ShowWindow( _hWnd, SW_MAXIMIZE );
+			}
+			else
+			{
+				// Restore all the window decorators.
+				::SetWindowLong( _hWnd, GWL_STYLE, WS_OVERLAPPEDWINDOW );
+
+				::SetWindowPos( _hWnd, HWND_NOTOPMOST,
+					_WindowRect.left,
+					_WindowRect.top,
+					_WindowRect.right - _WindowRect.left,
+					_WindowRect.bottom - _WindowRect.top,
+					SWP_FRAMECHANGED | SWP_NOACTIVATE );
+
+				::ShowWindow( _hWnd, SW_NORMAL );
+			}
+		}
+	}
+
+	void Window::SetFullscreen()
+	{
+		SetFullscreen( !_Fullscreen );
+	}
+
+	void Window::Resize( int32_t width, int32_t height )
+	{
+		_width = width;
+		_height = height;
+		// #TODO: Need to do anything to resize?
+	}
+
 	LRESULT CALLBACK Window::HandleMsgSetup( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam ) noexcept
 	{
 		// use create parameter passed in from CreateWindow() to store window class pointer at WinAPI side
@@ -172,16 +265,39 @@ namespace CronoEngine
 		return pWnd->HandleMsg( hWnd, msg, wParam, lParam );
 	}
 
+#include "imgui_impl_win32.h"
+	// Forward declare message handler from imgui_impl_win32.cpp
+	//extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
+
 	LRESULT Window::HandleMsg( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam ) noexcept
 	{
-		//if (ImGui_ImplWin32_WndProcHandler( hWnd, msg, wParam, lParam ))
-		//{
-		//	return true;
-		//}
+		if (ImGui_ImplWin32_WndProcHandler( hWnd, msg, wParam, lParam ))
+		{
+			return true;
+		}
 		//const auto& imio = ImGui::GetIO();
 
 		switch (msg)
 		{
+		case WM_SIZE:
+		{
+			RECT clientRect = {};
+			::GetClientRect( _hWnd, &clientRect );
+
+			int width = clientRect.right - clientRect.left;
+			int height = clientRect.bottom - clientRect.top;
+			if (_width != width || _height != height)
+			{
+				Resize( width, height );
+				pGfx->Resize( width, height );
+			}		
+		}
+		break;
+		case WM_PAINT:
+		{
+			//pGfx->Render();
+		}
+		break;
 			// we don't want the DefProc to handle this message because
 			// we want our destructor to destroy the window, so return 0 instead of break
 		case WM_CLOSE:

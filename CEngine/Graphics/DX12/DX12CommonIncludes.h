@@ -18,38 +18,25 @@
 *	along with The CronoGames Game Engine.  If not, see <http://www.gnu.org/licenses/>.   *
 ******************************************************************************************/
 #pragma once
-#include "Common/CommonHeaders.h"
-#include "Common/CronoException.h"
-#include "Graphics/Renderer.h"
 
-#include <dxgi1_6.h>
+// DirectX 12 specific headers.
 #include <d3d12.h>
-#include <wrl.h>
+#include <dxgi1_6.h>
+#include <d3dcompiler.h>
+#include <DirectXMath.h>
 
+// D3D12 extension library.
+#include "d3dx12.h" // (https://github.com/Microsoft/DirectX-Graphics-Samples/tree/master/Libraries/D3DX12)
+
+#pragma comment(lib, "D3d12.lib")
 #pragma comment(lib, "dxgi.lib")
-#pragma comment(lib, "d3d12.lib")
+#pragma comment(lib, "d3dcompiler.lib")
 
-namespace CronoEngine::Graphics::CD3D12
-{
-	constexpr int32_t FrameBufferCount{ 3 };
-}
+// imgui
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_win32.h"
+#include "imgui/imgui_impl_dx12.h"
+#include "imgui/imgui_internal.h"
 
-#ifdef _DEBUG
-#define NAME_D3D12_OBJECT(obj, name) obj->SetName(name); OutputDebugStringW(L"::D3D12 object created: "); OutputDebugStringW(name);OutputDebugStringW(L"\n");
-#define NAME_D3D12_OBJECT_Indexed(obj, n, name)				\
-{															\
-	wchar_t fullName[128];									\
-	if(swprintf_s(fullName, L"%s[%u]", name, n) > 0)		\
-	{														\
-		obj->SetName(fullName);								\
-		OutputDebugStringW(L"::D3D12 object created: ");	\
-		OutputDebugStringW(name);							\
-		OutputDebugStringW(L"\n");							\
-	}														\
-}
-#else
-#define NAME_D3D12_OBJECT(obj, name)
-#define NAME_D3D12_OBJECT_Indexed(obj, n, name)
-#endif // _DEBUG
-
-
+#include "DX12Utility.h"
+#include "Common/CommonHeaders.h"

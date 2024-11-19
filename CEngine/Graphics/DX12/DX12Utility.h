@@ -18,41 +18,17 @@
 *	along with The CronoGames Game Engine.  If not, see <http://www.gnu.org/licenses/>.   *
 ******************************************************************************************/
 #pragma once
-#include "DX12CommonHeaders.h"
+#include <d3d12.h>
+#include <dxgi1_6.h>
 
-namespace CronoEngine::Graphics::CD3D12::Core
+namespace CronoEngine::Graphics
 {
-	bool Initialize();
-	void Shutdown();
-	void Render();
-
-	template<typename T>
-	constexpr void Release( T*& resource )
+	class DX12Utility
 	{
-		if (resource)
-		{
-			resource->Release();
-			resource = nullptr;
-		}		
-	}
-
-	namespace detail
-	{
-		void DeferredRelease( IUnknown* resource );
-	}
-
-	template<typename T>
-	constexpr void DeferredRelease( T*& resource )
-	{
-		if (resource)
-		{
-			detail::DeferredRelease( resource );
-			resource->Release();
-			resource = nullptr;
-		}
-	}
-
-	ID3D12Device14* const Device();
-	int32_t CurrentFrameIndex();
-	void SetDeferredReleasesFlag();
+	public:
+		static void GetHardwareAdapter(
+			IDXGIFactory7* pFactory,
+			IDXGIAdapter1** ppAdapter,
+			bool requestHighPerformanceAdapter = false );
+	};
 }

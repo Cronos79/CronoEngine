@@ -24,32 +24,91 @@
 namespace CronoEngine
 {
 
-	Application::Application(int width, int height, std::string title, bool useAsSurface /*= false*/ )
-	{
-		m_Project = new Project();
-		m_Surface = new Graphics::RenderSurface();
-		m_Surface->CWindow = CreateCWindow( width, height, title.c_str(), useAsSurface );
-		CronoEngine::Graphics::Initialize( CronoEngine::Graphics::GraphicsPlatform::Direct3D12 );
+	Application::Application(int width, int height, std::string title, bool hasBorder /*= false*/ )
+	{	
+		if (CRenderer != nullptr)
+		{
+			ParseCommandLineArguments();
+		}
+		Initialize(width, height, title, hasBorder);
 	}
 
 	Application::~Application()
 	{
-		//CronoEngine::Graphics::Shutdown();
 	}
 
 	int Application::Run()
-	{	
+	{			
 		while (true)
 		{
 			// process all messages pending, but to not block for new messages
 			if (const auto ecode = Window::ProcessMessages())
 			{
 				// if return optional has value, means we're quitting so return exit code
+				CRenderer->Gfx().Shutdown();
 				return *ecode;
 			}
 			// execute the game logic
 			const auto dt = 0.0f;//timer.Mark() * speed_factor;
+			HandleInput( dt );
+			CRenderer->Gfx().BeginFrame();
 			Update( dt );
+			CRenderer->Gfx().EndFrame();
 		}
 	}
+
+	bool Application::Initialize( int width, int height, std::string title, bool hasBorder )
+	{
+		// Check for DirectX Math library support.
+		if (!DirectX::XMVerifyCPUSupport())
+		{
+			MessageBoxA( NULL, "Failed to verify DirectX Math library support.", "Error", MB_OK | MB_ICONERROR );
+			return false;
+		}
+		m_Project = new Project();
+		CRenderer = new Graphics::Renderer( width, height, title, hasBorder );
+	}
+
+	void Application::ShutDown()
+	{
+
+	}
+
+	void Application::ParseCommandLineArguments()
+	{
+		int argc;
+		wchar_t** argv = ::CommandLineToArgvW( ::GetCommandLineW(), &argc );
+
+		int32_t clientWidth = 1920;
+		int32_t clientHeight = 1080;
+		bool useWarp = false;
+		bool isDirty = false;
+
+		for (size_t i = 0; i < argc; ++i)
+		{
+			if (::wcscmp( argv[i], L"-w" ) == 0 || ::wcscmp( argv[i], L"--width" ) == 0)
+			{
+				clientWidth = ::wcstol( argv[++i], nullptr, 10 );
+				isDirty = true;
+			}
+			if (::wcscmp( argv[i], L"-h" ) == 0 || ::wcscmp( argv[i], L"--height" ) == 0)
+			{
+				clientHeight = ::wcstol( argv[++i], nullptr, 10 );
+				isDirty = true;
+			}
+			if (::wcscmp( argv[i], L"-warp" ) == 0 || ::wcscmp( argv[i], L"--warp" ) == 0)
+			{
+				useWarp = true;
+				isDirty = true;
+			}
+		}
+
+		if (isDirty)
+		{
+			CRenderer->Resize( clientWidth, clientHeight );
+		}
+		// Free memory allocated by CommandLineToArgvW
+		::LocalFree( argv );
+	}
+
 }
