@@ -37,6 +37,8 @@ namespace CronoEngine::Graphics
 		void SetFullscreen();
 		void SetFullscreen( bool fullscreen );
 		void ToggleVSync();
+		bool GetVideoMemory( DXGI_QUERY_VIDEO_MEMORY_INFO* ptrMemory ) noexcept;
+		bool SetVideoMemoryReservation( UINT64 reservationMemoryInBytes ) noexcept;
 	private:
 		void EnableDebugLayer();
 		ComPtr<IDXGIAdapter4> GetAdapter( bool useWarp );
@@ -69,6 +71,7 @@ namespace CronoEngine::Graphics
 		uint32_t _Height = 720;
 		// Window rectangle (used to toggle fullscreen state).
 		RECT _WindowRect;
+		bool _rayTracingSupport = false;
 		// The number of swap chain back buffers.
 #define NumFrames 3
 		// Use WARP adapter

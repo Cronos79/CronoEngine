@@ -29,5 +29,9 @@ namespace Game
 		App( int width, int height, std::string title );
 		void Update( float deltaTime ) override;
 		void ShutDown() override;
+	protected:
+		void HandleInput( float deltaTime ) override;
+		void UpdateUI( float deltaTime ) override;
+
 	};
 }

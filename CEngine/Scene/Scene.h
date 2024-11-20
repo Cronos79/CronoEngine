@@ -23,12 +23,19 @@
 
 namespace CronoEngine
 {
+	struct SceneData
+	{
+		std::string Name;
+		entt::registry Entities;
+	};
 	class Scene
 	{
 	public:
 		Scene();
 		~Scene();
-	public:
-		entt::registry m_Registry;
+		SceneData* LoadScene( std::string name );
+		bool SaveScene( SceneData* scene );
+	private:
+		SceneData* _data;
 	};
 }

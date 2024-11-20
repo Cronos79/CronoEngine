@@ -25,11 +25,7 @@ namespace CronoEngine
 {
 
 	Application::Application(int width, int height, std::string title, bool hasBorder /*= false*/ )
-	{	
-		if (CRenderer != nullptr)
-		{
-			ParseCommandLineArguments();
-		}
+	{		
 		Initialize(width, height, title, hasBorder);
 	}
 
@@ -49,24 +45,31 @@ namespace CronoEngine
 				return *ecode;
 			}
 			// execute the game logic
-			const auto dt = 0.0f;//timer.Mark() * speed_factor;
-			HandleInput( dt );
+			const auto dt = 0.0f;//timer.Mark() * speed_factor;			
 			CRenderer->Gfx().BeginFrame();
+			HandleInput( dt );
 			Update( dt );
+			UpdateUI( dt );
 			CRenderer->Gfx().EndFrame();
 		}
 	}
 
 	bool Application::Initialize( int width, int height, std::string title, bool hasBorder )
 	{
+		if (CRenderer != nullptr)
+		{
+			ParseCommandLineArguments();
+		}
 		// Check for DirectX Math library support.
 		if (!DirectX::XMVerifyCPUSupport())
 		{
 			MessageBoxA( NULL, "Failed to verify DirectX Math library support.", "Error", MB_OK | MB_ICONERROR );
 			return false;
 		}
-		m_Project = new Project();
+		_CurrentProject = new Project();
 		CRenderer = new Graphics::Renderer( width, height, title, hasBorder );
+
+		return true;
 	}
 
 	void Application::ShutDown()

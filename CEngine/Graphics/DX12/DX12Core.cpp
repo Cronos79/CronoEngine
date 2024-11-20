@@ -35,9 +35,39 @@ namespace CronoEngine::Graphics
 
 	void DX12Core::Init()
 	{
+#if defined(_DEBUG)
+		// Enable the D3D12 debug layer.
+		{
+			ComPtr<ID3D12Debug> debugController;
+			if (SUCCEEDED( D3D12GetDebugInterface( IID_PPV_ARGS( &debugController ) ) ))
+			{
+				debugController->EnableDebugLayer();
+			}
+		}
+#endif
 		_TearingSupported = CheckTearingSupport();
 		ComPtr<IDXGIAdapter4> dxgiAdapter4 = GetAdapter( _UseWarp );
 		_Device = CreateDevice( dxgiAdapter4 );
+		D3D12_FEATURE_DATA_D3D12_OPTIONS5 info = {};
+		if (SUCCEEDED( _Device->CheckFeatureSupport( D3D12_FEATURE_D3D12_OPTIONS5, &info, sizeof( info ) ) ))
+		{
+			switch (info.RaytracingTier)
+			{
+			case D3D12_RAYTRACING_TIER_1_0:
+			case D3D12_RAYTRACING_TIER_1_1:
+			{
+				_rayTracingSupport = true;
+			}break;
+			case D3D12_RAYTRACING_TIER_NOT_SUPPORTED:
+			{
+				_rayTracingSupport = false;
+			}break;
+			default:
+			{
+				_rayTracingSupport = false;
+			}break;
+			}
+		}
 		_CommandQueue = CreateCommandQueue( _Device, D3D12_COMMAND_LIST_TYPE_DIRECT );
 		_SwapChain = CreateSwapChain( _HWnd, _CommandQueue,	_Width, _Height, NumFrames );
 		_CurrentBackBufferIndex = _SwapChain->GetCurrentBackBufferIndex();
@@ -59,6 +89,13 @@ namespace CronoEngine::Graphics
 		_CommandList = CreateCommandList( _Device, _CommandAllocators[_CurrentBackBufferIndex], D3D12_COMMAND_LIST_TYPE_DIRECT );
 		_Fence = CreateFence( _Device );
 		_FenceEvent = CreateEventHandle();
+
+		// Memory stuff
+		// Get GPU memory
+		DXGI_QUERY_VIDEO_MEMORY_INFO memInfo;
+		//bool xres = SetVideoMemoryReservation( MEM_GIB( 1 ) );
+		dxgiAdapter4->SetVideoMemoryReservation( NULL, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, MEM_GIB( 1 ) );
+		dxgiAdapter4->QueryVideoMemoryInfo( NULL, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &memInfo );
 
 		ImGui_ImplDX12_Init( _Device.Get(), NumFrames,
 			DXGI_FORMAT_R8G8B8A8_UNORM, *_SRVDescriptorHeap.GetAddressOf(),
@@ -520,4 +557,19 @@ namespace CronoEngine::Graphics
 
 		return;
 	}
+
+	bool DX12Core::GetVideoMemory( DXGI_QUERY_VIDEO_MEMORY_INFO* ptrMemory ) noexcept
+	{
+		ComPtr<IDXGIAdapter4> ptrAdapter4;
+		//if (!queryInterface) return false;
+		return(SUCCEEDED( ptrAdapter4->QueryVideoMemoryInfo( NULL, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, ptrMemory ) ));
+	}
+
+	bool DX12Core::SetVideoMemoryReservation( UINT64 reservationMemoryInBytes ) noexcept
+	{
+		ComPtr<IDXGIAdapter3> ptrAdapter3;
+		//if (!queryInterface) return false;
+		return(SUCCEEDED( ptrAdapter3->SetVideoMemoryReservation( NULL, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, reservationMemoryInBytes ) ));
+	}
+
 }

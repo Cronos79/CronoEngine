@@ -18,29 +18,24 @@
 *	along with The CronoGames Game Engine.  If not, see <http://www.gnu.org/licenses/>.   *
 ******************************************************************************************/
 #pragma once
-#include "Common/CommonHeaders.h"
-#include "Scene/Scene.h"
-#include "Windows/Window.h"
-#include "Graphics/Renderer.h"
+#include <stdint.h>
 
 namespace CronoEngine
 {
-	struct ProjectData
-	{
-		std::string Name;
-		SceneData* ActiveScene;
-	};
-
-	class Project
+	class MainUI
 	{
 	public:
-		Project();
-		~Project();
+		MainUI() = default;
+		~MainUI() = default;
 
-		SceneData* GetActiveScene();
-		bool LoadScene( std::string name );
+		void RenderUI();
 	private:
-		ProjectData _data;
+		void TopMenuBar();
+		void FPSDisplay();
+		void RightSideBar();
+		void LeftSideBar();
+		void BottomBar();
+		void Test();
+		void SetNextWinLoc( int32_t x, int32_t y );
 	};
 }
-

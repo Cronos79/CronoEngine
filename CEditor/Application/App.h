@@ -20,6 +20,7 @@
 #pragma once
 #include "Windows/EntryPoint.cpp"
 #include "Application/Application.h"
+#include "../UI/MainUI.h"
 
 namespace CronoEngine
 {
@@ -27,9 +28,15 @@ namespace CronoEngine
 	{
 	public:
 		App( int width, int height, std::string title, bool useAsSurface = false );		
+
 	protected:
 		void HandleInput( float deltaTime ) override;
 		void Update( float deltaTime ) override;
 		void ShutDown() override;
+		void UpdateUI( float deltaTime ) override;
+
+	private:
+		MainUI* _ui;
+
 	};
 }

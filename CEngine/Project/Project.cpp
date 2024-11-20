@@ -21,10 +21,26 @@
 
 CronoEngine::Project::Project()
 {
-	ActiveScene = new Scene();
+	_data.ActiveScene = new SceneData();
 }
 
 CronoEngine::Project::~Project()
 {
 
+}
+
+CronoEngine::SceneData* CronoEngine::Project::GetActiveScene()
+{
+	return _data.ActiveScene;
+}
+
+bool CronoEngine::Project::LoadScene( std::string name )
+{
+	Scene* scene = new Scene();
+	SceneData* s = scene->LoadScene( name );
+	if (s)
+	{
+		_data.ActiveScene = s;
+	}
+	return true;
 }

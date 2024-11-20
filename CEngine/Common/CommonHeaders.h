@@ -35,3 +35,11 @@ using namespace Microsoft::WRL;
 // My includes
 #include "Common/Helpers.h"
 #include "Common/CronoException.h"
+#include "CMath.h"
+
+#ifdef _DEBUG
+#define DEBUG_EXE(args) args
+#else
+#define DEBUG_EXE(args) ##
+#endif // _DEBUG
+

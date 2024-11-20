@@ -28,7 +28,7 @@ namespace CronoEngine
 	App::App( int width, int height, std::string title, bool useAsSurface /*= false*/ )
 		:Application(width, height, title, useAsSurface)
 	{
-		
+		_ui = new MainUI();
 	}
 
 	void App::HandleInput( float deltaTime )
@@ -49,13 +49,12 @@ namespace CronoEngine
 
 	void App::Update( float deltaTimeF )
 	{	
-		ImGuiIO& io = ImGui::GetIO(); (void)io;
-		ImGui::Begin( "FPS" );
-		ImGui::Text( "Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate );
-		ImGui::End();
-		ImGui::Begin( "FPS1" );
-		ImGui::Text( "Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate );
-		ImGui::End();
+	
+	}
+
+	void App::UpdateUI( float deltaTime )
+	{
+		_ui->RenderUI();
 	}
 
 	void App::ShutDown()

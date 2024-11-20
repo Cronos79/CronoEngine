@@ -37,6 +37,17 @@ namespace Game
 	{
 
 	}
+
+	void App::HandleInput( float deltaTime )
+	{
+		
+	}
+
+	void App::UpdateUI( float deltaTime )
+	{
+		
+	}
+
 }
 CronoEngine::Application* CreateEngineApp()
 {

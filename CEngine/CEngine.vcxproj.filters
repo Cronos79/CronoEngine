@@ -37,6 +37,8 @@
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="Graphics\DX12\CommandQueue.h" />
+    <ClInclude Include="Common\CMath.h" />
+    <ClInclude Include="Graphics\DX12\XDebug.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application\Application.cpp" />
@@ -57,8 +59,10 @@
     <ClCompile Include="imgui\imgui_tables.cpp" />
     <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="Graphics\DX12\CommandQueue.cpp" />
+    <ClCompile Include="Graphics\DX12\XDebug.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Graphics\Shaders\VertexShader.hlsl" />
+    <FxCompile Include="Graphics\Shaders\PixelShader.hlsl" />
   </ItemGroup>
 </Project>

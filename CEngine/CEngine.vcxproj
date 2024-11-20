@@ -97,6 +97,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Application\Application.h" />
+    <ClInclude Include="Common\CMath.h" />
     <ClInclude Include="Common\CommonHeaders.h" />
     <ClInclude Include="Common\CronoException.h" />
     <ClInclude Include="Common\Helpers.h" />
@@ -115,6 +116,7 @@
     <ClInclude Include="Graphics\DX12\DX12Utility.h" />
     <ClInclude Include="Graphics\DX12\DX12CommonIncludes.h" />
     <ClInclude Include="Graphics\DX12\DX12Core.h" />
+    <ClInclude Include="Graphics\DX12\XDebug.h" />
     <ClInclude Include="Graphics\Renderer.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
@@ -139,6 +141,7 @@
     <ClCompile Include="Graphics\DX12\CommandQueue.cpp" />
     <ClCompile Include="Graphics\DX12\DX12Utility.cpp" />
     <ClCompile Include="Graphics\DX12\DX12Core.cpp" />
+    <ClCompile Include="Graphics\DX12\XDebug.cpp" />
     <ClCompile Include="Graphics\Renderer.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
@@ -154,6 +157,10 @@
     <ClCompile Include="Windows\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="Graphics\Shaders\PixelShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
     <FxCompile Include="Graphics\Shaders\VertexShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>

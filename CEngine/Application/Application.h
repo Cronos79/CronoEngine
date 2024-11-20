@@ -30,32 +30,16 @@ namespace CronoEngine
 		Application( int width, int height, std::string title, bool hasBorder = false );
 		~Application();
 		int Run();
-		/**
-		 *  Initialize the DirectX Runtime.
-		*/
-		virtual bool Initialize( int width, int height, std::string title, bool hasBorder = false );
-
-		/**
-		 *  Load content required for the demo.
-		 */
-		virtual bool LoadContent() = 0;
-
-		/**
-		 *  Unload demo specific content that was loaded in LoadContent.
-		 */
-		virtual void UnloadContent() = 0;
-
-		/**
-		 * Destroy any resource that are used by the game.
-		 */
 		virtual void ShutDown();
 	protected:
 		virtual void HandleInput( float deltaTime ) = 0;
 		virtual void Update( float deltaTime ) = 0;
+		virtual void UpdateUI( float deltaTime ) = 0;
 	private:
+		bool Initialize( int width, int height, std::string title, bool hasBorder );
 		void ParseCommandLineArguments();
 	protected:
-		Project* m_Project;
+		Project* _CurrentProject;
 		Graphics::Renderer* CRenderer = nullptr;
 	};
 }

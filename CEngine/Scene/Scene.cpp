@@ -31,4 +31,15 @@ namespace CronoEngine
 	{
 
 	}
+
+	CronoEngine::SceneData* Scene::LoadScene( std::string name )
+	{
+		// #TODO: Get a list of scenes in the project and return the one matching name
+		return {};
+	}
+
+	bool Scene::SaveScene( SceneData* scene )
+	{
+		return true;
+	}
 }
